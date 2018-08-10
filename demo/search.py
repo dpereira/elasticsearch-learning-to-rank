@@ -2,7 +2,7 @@ baseQuery = {
   "query": {
       "multi_match": {
           "query": "test",
-          "fields": ["title", "overview"]
+          "fields": ["title", "description"]
        }
    },
   "rescore": {
