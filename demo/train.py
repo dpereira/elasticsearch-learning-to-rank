@@ -5,7 +5,7 @@ from utils import Elasticsearch, ES_HOST, ES_AUTH
 
 def trainModel(judgmentsWithFeaturesFile, modelOutput, whichModel=6):
     # java -jar RankLib-2.6.jar -ranker 6 -train sample_judgments_wfeatures.txt -save model.txt
-    cmd = "java -jar RankLib-2.8.jar -ranker %s -train %s -save %s -frate 1.0" % (whichModel, judgmentsWithFeaturesFile, modelOutput)
+    cmd = "java -jar RankLib-2.8.jar -missingZero -ranker %s -train %s -save %s -frate 1.0" % (whichModel, judgmentsWithFeaturesFile, modelOutput)
     print("*********************************************************************")
     print("*********************************************************************")
     print("Running %s" % cmd)
@@ -61,7 +61,7 @@ if __name__ == "__main__":
     logFeatures(es, judgmentsByQid=movieJudgments)
     buildFeaturesJudgmentsFile(movieJudgments, filename='sample_judgments_wfeatures.txt')
     # Train each ranklib model type
-    for modelType in [9]:
+    for modelType in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]:
         # 0, MART
         # 1, RankNet
         # 2, RankBoost
