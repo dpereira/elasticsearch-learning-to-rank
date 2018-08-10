@@ -37,7 +37,7 @@ if __name__ == "__main__":
     model = "test_6"
     if len(argv) > 2:
         model = argv[2]
-    results = es.search(index='tmdb', doc_type='movie', body=ltrQuery(argv[1], model))
+    results = es.search(index='test_ltr', doc_type='document', body=ltrQuery(argv[1], model))
     for result in results['hits']['hits']:
         print(result['_source']['title'])
 

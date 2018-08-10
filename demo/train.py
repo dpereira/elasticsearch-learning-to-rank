@@ -61,7 +61,7 @@ if __name__ == "__main__":
     logFeatures(es, judgmentsByQid=movieJudgments)
     buildFeaturesJudgmentsFile(movieJudgments, filename='sample_judgments_wfeatures.txt')
     # Train each ranklib model type
-    for modelType in [0,1,2,3,4,5,6,7,8,9]:
+    for modelType in [9]:
         # 0, MART
         # 1, RankNet
         # 2, RankBoost
