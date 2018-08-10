@@ -134,13 +134,17 @@
                 {
                     "multi_match": {
                         "fields": [
-                            "title.shingle_simple^10", 
-                            "search_annotations.keywords.shingle_simple^10",
-                            "subtitle.shingle_simple^4",
-                            "body.shingle_simple"
-                        ],
-                        "operator": "AND",
-                        "analyzer": "globo_analyzer_shingle_simple", 
+                          "title^10", 
+                          "title.bigram_trigram_no_space^10",
+                          "search_annotations.keywords^10",
+                          "subtitle^4", 
+                          "description^2",
+                          "body",
+                          "site",
+                          "program"
+                        ],  
+                        "minimum_should_match": "3<80%",
+                        "analyzer": "globo_analyzer", 
                         "query": "{{keywords}}"
                     }
                 }            ]

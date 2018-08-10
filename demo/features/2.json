@@ -19,14 +19,14 @@
                                     {
                                         "match": {
                                             "search_annotations.boost.keywords": {
-                                                "query": "{{q}}"
+                                                "query": "{{keywords}}"
                                             }
                                         }
                                     },
                                     {
                                         "match": {
                                             "search_annotations.boost.keywords": {
-                                                "query": "{{q}}",
+                                                "query": "{{keywords}}",
                                                 "fuzziness": "AUTO",
                                                 "operator": "AND"
                                             }
@@ -54,7 +54,6 @@
             ],
             "filter": [
                 {
-                    "query": {
                         "bool": {
                             "should": [
                                 {
@@ -64,7 +63,7 @@
                                             "program",
                                             "title.bigram_trigram_no_space"
                                         ],
-                                        "query": "{{q}}",
+                                        "query": "{{keywords}}",
                                         "analyzer": "globo_analyzer"
                                     }
                                 },
@@ -74,7 +73,7 @@
                                             "title",
                                             "subtitle"
                                         ],
-                                        "query": "{{q}}",
+                                        "query": "{{keywords}}",
                                         "analyzer": "globo_analyzer_bigram_trigram_no_space"
                                     }
                                 },
@@ -88,7 +87,7 @@
                                           "description"
                                       ], 
                                       "analyzer": "globo_analyzer", 
-                                      "query": "{{q}}"
+                                      "query": "{{keywords}}"
                                     }
                                 },
                                 {
@@ -98,7 +97,7 @@
                                             "search_annotations.keywords.snowball",
                                             "body.snowball"
                                         ],
-                                        "query": "{{q}}", 
+                                        "query": "{{keywords}}", 
                                         "minimum_should_match": "2<80%"
                                     }
                                 },
@@ -112,7 +111,7 @@
                                           "description"
                                       ], 
                                       "analyzer": "globo_analyzer", 
-                                      "query": "{{q}}",
+                                      "query": "{{keywords}}",
                                       "fuzziness": "AUTO"
                                     }
                                 },
@@ -123,26 +122,13 @@
                                           "equipeVisitanteNome"
                                       ], 
                                       "analyzer": "globo_analyzer", 
-                                      "query": "{{q}}",
+                                      "query": "{{keywords}}",
                                       "type": "cross_fields"
                                     }
-                                },
-                                {
-                                    "multi_match": {
-                                      "fields": [
-                                          "equipeMandanteNome",
-                                          "equipeVisitanteNome"
-                                      ], 
-                                      "analyzer": "globo_analyzer", 
-                                      "query": "{{q}}",
-                                      "type": "cross_fields",
-                                      "fuzziness": "AUTO"
-                                    }
-                                }
+                                }                            
                             ]
                         }
                     }
-                }
             ],
             "should": [
                 {
@@ -159,10 +145,11 @@
                         ], 
                         "operator": "AND", 
                         "analyzer": "globo_analyzer", 
-                        "query": "{{q}}",
+                        "query": "{{keywords}}",
                         "boost": 10
                     }
-                }            ]
+                }
+            ]
         }
     }, 
     "aggs": {
