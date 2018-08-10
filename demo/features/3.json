@@ -1,0 +1,196 @@
+{ 
+    "query": {
+        "bool": {
+            "must_not": [
+                {"term": {"liveNow": true}},
+                {"term": {"statusTransmissao.raw": "a"}},
+                {"term": {"statusTransmissao.raw": "c" }},
+                {
+                    "nested": {
+                        "path": "search_annotations.boost",
+                        "query": {
+                            "bool": {
+                                "filter": [
+                                    {
+                                        "term": {
+                                            "search_annotations.boost.enabled": "true"
+                                        }
+                                    },
+                                    {
+                                        "match": {
+                                            "search_annotations.boost.keywords": {
+                                                "query": "{{q}}"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "match": {
+                                            "search_annotations.boost.keywords": {
+                                                "query": "{{q}}",
+                                                "fuzziness": "AUTO",
+                                                "operator": "AND"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "range": {
+                                            "search_annotations.boost.start_date": {
+                                                "lte": "now"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "range": {
+                                            "search_annotations.boost.end_date": {
+                                                "gte": "now"
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            ],
+            "filter": [
+                {
+                    "query": {
+                        "bool": {
+                            "should": [
+                                {
+                                    "multi_match": {
+                                        "fields": [
+                                            "site",
+                                            "program",
+                                            "title.bigram_trigram_no_space"
+                                        ],
+                                        "query": "{{q}}",
+                                        "analyzer": "globo_analyzer"
+                                    }
+                                },
+                                {
+                                    "multi_match": {
+                                        "fields": [
+                                            "title",
+                                            "subtitle"
+                                        ],
+                                        "query": "{{q}}",
+                                        "analyzer": "globo_analyzer_bigram_trigram_no_space"
+                                    }
+                                },
+                                {
+                                    "multi_match": {
+                                      "fields": [
+                                          "title", 
+                                          "search_annotations.keywords",
+                                          "body", 
+                                          "subtitle", 
+                                          "description"
+                                      ], 
+                                      "analyzer": "globo_analyzer", 
+                                      "query": "{{q}}"
+                                    }
+                                },
+                                {
+                                    "multi_match": {
+                                        "fields": [
+                                            "title.snowball",
+                                            "search_annotations.keywords.snowball",
+                                            "body.snowball"
+                                        ],
+                                        "query": "{{q}}", 
+                                        "minimum_should_match": "2<80%"
+                                    }
+                                },
+                                {
+                                    "multi_match": {
+                                      "fields": [
+                                          "title", 
+                                          "search_annotations.keywords",
+                                          "body", 
+                                          "subtitle", 
+                                          "description"
+                                      ], 
+                                      "analyzer": "globo_analyzer", 
+                                      "query": "{{q}}",
+                                      "fuzziness": "AUTO"
+                                    }
+                                },
+                                {
+                                    "multi_match": {
+                                      "fields": [
+                                          "equipeMandanteNome",
+                                          "equipeVisitanteNome"
+                                      ], 
+                                      "analyzer": "globo_analyzer", 
+                                      "query": "{{q}}",
+                                      "type": "cross_fields"
+                                    }
+                                },
+                                {
+                                    "multi_match": {
+                                      "fields": [
+                                          "equipeMandanteNome",
+                                          "equipeVisitanteNome"
+                                      ], 
+                                      "analyzer": "globo_analyzer", 
+                                      "query": "{{q}}",
+                                      "type": "cross_fields",
+                                      "fuzziness": "AUTO"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            ],
+            "should": [
+                {
+                    "multi_match": {
+                        "fields": [
+                            "title^10",
+                            "subtitle^4"
+                        ],
+                        "query": "{{q}}",
+                        "analyzer": "globo_analyzer_bigram_trigram_no_space",
+                        "boost": 3
+                    }
+                }
+            ]
+        }
+    }, 
+    "aggs": {
+        "species": {
+            "terms": {
+                "field": "species", 
+                "size": 100
+            }
+        }
+    }, 
+    "highlight": {
+        "fields": {
+            "body": {
+                "fragment_size": 130, 
+                "number_of_fragments": 2
+            }
+        }
+    },
+    "rescore": {
+        "query": {
+            "rescore_query_weight": 1,
+            "score_mode": "multiply",
+            "query_weight": 1,
+            "rescore_query": {
+                "function_score": {
+                    "query": {"match_all": {}},
+                    "functions": [
+                        {"script_score": {
+                            "script": "_score * (80.0 / (1e-08 * (DateTime.now().getMillis() - (doc['_type'].value=='video' ? doc['issued'].date.millis : doc['modified'].date.millis)) + 1.0))"
+                        }}
+                    ]
+                }
+            }
+        },
+        "window_size": 3000
+    }
+}
